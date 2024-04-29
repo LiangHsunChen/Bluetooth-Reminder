@@ -1,6 +1,9 @@
 package com.example.bluetoothreminder
 
 import android.bluetooth.BluetoothDevice
+import android.content.BroadcastReceiver
+import android.content.Context
+import android.content.Intent
 import android.content.IntentFilter
 import android.os.Bundle
 import androidx.activity.ComponentActivity
@@ -15,6 +18,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.core.app.NotificationCompat
+import androidx.core.app.NotificationManagerCompat
 import com.example.bluetoothreminder.ui.theme.BluetoothReminderTheme
 
 
@@ -47,5 +52,31 @@ fun Greeting(name: String, modifier: Modifier = Modifier) {
 fun GreetingPreview() {
     BluetoothReminderTheme {
         Greeting("Android")
+    }
+}
+
+class BluetoothReceiver : BroadcastReceiver() {
+    override fun onReceive(context: Context, intent: Intent) {
+        val action = intent.action
+        if (BluetoothDevice.ACTION_ACL_DISCONNECTED == action) {
+
+        }
+    }
+
+    private fun showNotification(context: Context, title: String, message: String) {
+        val builder = NotificationCompat.Builder(context, "channel_id")
+            .setContentTitle(title)
+            .setContentText(message)
+            .setPriority(NotificationCompat.PRIORITY_DEFAULT)
+
+        // Display the notification
+        with(NotificationManagerCompat.from(context)) {
+            try {
+                notify(System.currentTimeMillis().toInt(), builder.build())
+            } catch (e: SecurityException) {
+                // Handle the case where the app doesn't have permission to show notifications
+                e.printStackTrace()
+            }
+        }
     }
 }
