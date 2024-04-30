@@ -30,7 +30,7 @@ class MainActivity : ComponentActivity() {
             BluetoothReminderTheme {
                 // A surface container using the 'background' color from the theme
                 Surface(modifier = Modifier.fillMaxSize(), color = MaterialTheme.colorScheme.background) {
-                    Greeting("Android")
+                    Greeting("")
                 }
             }
         }
@@ -55,11 +55,15 @@ fun GreetingPreview() {
     }
 }
 
-class BluetoothReceiver : BroadcastReceiver() {
-    override fun onReceive(context: Context, intent: Intent) {
-        val action = intent.action
-        if (BluetoothDevice.ACTION_ACL_DISCONNECTED == action) {
+class BluetoothReceiver(private val deviceAddress: String)  : BroadcastReceiver() {
+    override fun onReceive(context: Context, intent: Intent?) {
 
+        if (intent?.action == BluetoothDevice.ACTION_ACL_DISCONNECTED) {
+            val disconnectedDevice: BluetoothDevice? = intent.getParcelableExtra(BluetoothDevice.EXTRA_DEVICE)
+            if (disconnectedDevice?.address == deviceAddress) {
+                // The specific device is disconnected
+                showNotification(context, "Bluetooth Device Disconnected", "Your device has been disconnected.")
+            }
         }
     }
 
